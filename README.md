@@ -5,8 +5,8 @@
 [![Software License](https://img.shields.io/badge/license-GPL-brightgreen.svg?style=flat)](https://www.gnu.org/licenses/gpl-2.0.html)
 
 
-[![Latest Pre-Release](https://img.shields.io/github/tag/XoopsModules25x/publisher.svg?style=flat)](https://github.com/XoopsModules25x/publisher/tags/)
-[![Latest Version](https://img.shields.io/github/release/XoopsModules25x/publisher.svg?style=flat)](https://github.com/XoopsModules25x/publisher/releases/)
+[![Latest Pre-Release](https://img.shields.io/github/tag/mambax7/realestate.svg?style=flat)](https://github.com/mambax7/realestate/tags/)
+[![Latest Version](https://img.shields.io/github/release/mambax7/realestate.svg?style=flat)](https://github.com/mambax7/realestate/releases/)
 
 ## A full-featured real estate and rental listings system for XOOPS CMS.
 
