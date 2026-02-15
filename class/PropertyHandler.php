@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,54 +14,70 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 namespace XoopsModules\Realestate;
 
+use Criteria;
+use CriteriaCompo;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use XoopsDatabase;
+use XoopsDatabaseFactory;
+use XoopsObject;
+use XoopsPersistableObjectHandler;
+
+use function sprintf;
+
 /**
- * Property data-access handler
+ * Property data-access handler.
  */
-class PropertyHandler extends \XoopsPersistableObjectHandler
+class PropertyHandler extends XoopsPersistableObjectHandler
 {
-    private const TABLE      = 'realestate_properties';
-    private const ENTITY     = Property::class;
-    private const KEYNAME    = 'property_id';
+    private const TABLE = 'realestate_properties';
+
+    private const ENTITY = Property::class;
+
+    private const KEYNAME = 'property_id';
+
     private const IDENTIFIER = 'title';
 
     /** @var Helper|null */
     public $helper;
 
-    public function __construct(?\XoopsDatabase $db = null, ?Helper $helper = null)
+    public function __construct(?XoopsDatabase $db = null, ?Helper $helper = null)
     {
         $this->helper = $helper;
         if (null === $db) {
-            $db = \XoopsDatabaseFactory::getDatabaseConnection();
+            $db = XoopsDatabaseFactory::getDatabaseConnection();
         }
         parent::__construct($db, static::TABLE, static::ENTITY, static::KEYNAME, static::IDENTIFIER);
     }
 
     /**
-     * Insert or update a property; auto-generates slug and timestamps
+     * Insert or update a property; auto-generates slug and timestamps.
      *
-     * @param \XoopsObject $property
-     * @param bool         $force
+     * @param XoopsObject $property
+     * @param bool $force
+     *
      * @return bool|int
      */
-    public function insert(\XoopsObject $property, $force = false)
+    public function insert(XoopsObject $property, $force = false)
     {
         // Auto-generate slug
         $slug = $property->getVar('slug', 'n');
         if (empty($slug)) {
-            $slug = Utility::generateSlug((string)$property->getVar('title', 'n'));
+            $slug = Utility::generateSlug((string) $property->getVar('title', 'n'));
         }
-        $property->setVar('slug', Utility::uniqueSlug($slug, (int)$property->getVar('property_id')));
+        $property->setVar('slug', Utility::uniqueSlug($slug, (int) $property->getVar('property_id')));
 
         // Timestamps
-        $now = \time();
-        if ((int)$property->getVar('created_at') === 0) {
+        $now = time();
+        if ((int) $property->getVar('created_at') === 0) {
             $property->setVar('created_at', $now);
         }
         $property->setVar('updated_at', $now);
@@ -68,20 +86,21 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * Delete property and all associated images/files
+     * Delete property and all associated images/files.
      *
-     * @param \XoopsObject $property
-     * @param bool         $force
+     * @param XoopsObject $property
+     * @param bool $force
+     *
      * @return bool
      */
-    public function delete(\XoopsObject $property, $force = false)
+    public function delete(XoopsObject $property, $force = false)
     {
-        $propertyId = (int)$property->getVar('property_id');
+        $propertyId = (int) $property->getVar('property_id');
         $helper = $this->helper ?: Helper::getInstance();
 
         // Delete images from DB
         $imageHandler = $helper->getHandler('Image');
-        $criteria = new \Criteria('property_id', (string)$propertyId);
+        $criteria = new Criteria('property_id', (string) $propertyId);
         $imageHandler->deleteAll($criteria, true);
 
         // Delete image directory
@@ -90,19 +109,20 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
 
         // Delete favorites
         $favHandler = $helper->getHandler('Favorite');
-        $favHandler->deleteAll(new \Criteria('property_id', (string)$propertyId), true);
+        $favHandler->deleteAll(new Criteria('property_id', (string) $propertyId), true);
 
         // Delete messages
         $msgHandler = $helper->getHandler('Message');
-        $msgHandler->deleteAll(new \Criteria('property_id', (string)$propertyId), true);
+        $msgHandler->deleteAll(new Criteria('property_id', (string) $propertyId), true);
 
         return parent::delete($property, $force);
     }
 
     /**
-     * Get active listings with optional filters
+     * Get active listings with optional filters.
      *
      * @param array<string, mixed> $filters
+     *
      * @return Property[]
      */
     public function getListings(
@@ -124,73 +144,19 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * Count listings matching filters
+     * Count listings matching filters.
      *
      * @param array<string, mixed> $filters
      */
     public function countListings(array $filters = []): int
     {
         $criteria = $this->buildFilterCriteria($filters);
+
         return $this->getCount($criteria);
     }
 
     /**
-     * Build CriteriaCompo from filter array
-     *
-     * @param array<string, mixed> $filters
-     */
-    private function buildFilterCriteria(array $filters): \CriteriaCompo
-    {
-        $criteria = new \CriteriaCompo();
-
-        // Default: only active
-        if (!isset($filters['is_active'])) {
-            $criteria->add(new \Criteria('is_active', '1'));
-        } elseif ($filters['is_active'] !== 'all') {
-            $criteria->add(new \Criteria('is_active', (string)(int)$filters['is_active']));
-        }
-
-        if (!empty($filters['property_type'])) {
-            $criteria->add(new \Criteria('property_type', $this->db->escape($filters['property_type'])));
-        }
-
-        if (!empty($filters['status'])) {
-            $criteria->add(new \Criteria('status', $this->db->escape($filters['status'])));
-        }
-
-        if (!empty($filters['city'])) {
-            $criteria->add(new \Criteria('city', $this->db->escape($filters['city'])));
-        }
-
-        if (isset($filters['bedrooms_min']) && $filters['bedrooms_min'] > 0) {
-            $criteria->add(new \Criteria('bedrooms', (string)(int)$filters['bedrooms_min'], '>='));
-        }
-
-        if (isset($filters['bathrooms_min']) && $filters['bathrooms_min'] > 0) {
-            $criteria->add(new \Criteria('bathrooms', (string)(int)$filters['bathrooms_min'], '>='));
-        }
-
-        if (isset($filters['price_min']) && $filters['price_min'] > 0) {
-            $criteria->add(new \Criteria('price', (string)(float)$filters['price_min'], '>='));
-        }
-
-        if (isset($filters['price_max']) && $filters['price_max'] > 0) {
-            $criteria->add(new \Criteria('price', (string)(float)$filters['price_max'], '<='));
-        }
-
-        if (!empty($filters['is_featured'])) {
-            $criteria->add(new \Criteria('is_featured', '1'));
-        }
-
-        if (!empty($filters['owner_id'])) {
-            $criteria->add(new \Criteria('owner_id', (string)(int)$filters['owner_id']));
-        }
-
-        return $criteria;
-    }
-
-    /**
-     * Full-text search on title + description
+     * Full-text search on title + description.
      *
      * @return Property[]
      */
@@ -198,7 +164,7 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
     {
         $escapedQuery = $this->db->escape($query);
         $table = $this->db->prefix(static::TABLE);
-        $sql = \sprintf(
+        $sql = sprintf(
             "SELECT *, MATCH(`title`, `description`) AGAINST('%s') AS relevance "
             . "FROM `%s` WHERE `is_active` = 1 AND MATCH(`title`, `description`) AGAINST('%s') "
             . 'ORDER BY relevance DESC LIMIT %d, %d',
@@ -217,11 +183,12 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
                 $objects[] = $obj;
             }
         }
+
         return $objects;
     }
 
     /**
-     * Get distinct cities for filter dropdown
+     * Get distinct cities for filter dropdown.
      *
      * @return string[]
      */
@@ -236,11 +203,12 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
                 $cities[] = $row['city'];
             }
         }
+
         return $cities;
     }
 
     /**
-     * Get featured listings
+     * Get featured listings.
      *
      * @return Property[]
      */
@@ -250,7 +218,7 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * Get latest listings
+     * Get latest listings.
      *
      * @return Property[]
      */
@@ -260,17 +228,18 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * Get property by slug
+     * Get property by slug.
      */
     public function getBySlug(string $slug): ?Property
     {
-        $criteria = new \Criteria('slug', $this->db->escape($slug));
+        $criteria = new Criteria('slug', $this->db->escape($slug));
         $objects = $this->getObjects($criteria);
-        return !empty($objects) ? \reset($objects) : null;
+
+        return ! empty($objects) ? reset($objects) : null;
     }
 
     /**
-     * Get dashboard statistics
+     * Get dashboard statistics.
      *
      * @return array{total: int, active: int, featured: int, for_sale: int, for_rent: int, sold: int, rented: int}
      */
@@ -289,38 +258,95 @@ class PropertyHandler extends \XoopsPersistableObjectHandler
         $result = $this->db->queryF($sql);
         if ($result) {
             $row = $this->db->fetchArray($result);
+
             return [
-                'total'    => (int)$row['total'],
-                'active'   => (int)$row['active'],
-                'featured' => (int)$row['featured'],
-                'for_sale' => (int)$row['for_sale'],
-                'for_rent' => (int)$row['for_rent'],
-                'sold'     => (int)$row['sold'],
-                'rented'   => (int)$row['rented'],
+                'total'    => (int) $row['total'],
+                'active'   => (int) $row['active'],
+                'featured' => (int) $row['featured'],
+                'for_sale' => (int) $row['for_sale'],
+                'for_rent' => (int) $row['for_rent'],
+                'sold'     => (int) $row['sold'],
+                'rented'   => (int) $row['rented'],
             ];
         }
+
         return ['total' => 0, 'active' => 0, 'featured' => 0, 'for_sale' => 0, 'for_rent' => 0, 'sold' => 0, 'rented' => 0];
     }
 
     /**
-     * Remove a directory recursively
+     * Build CriteriaCompo from filter array.
+     *
+     * @param array<string, mixed> $filters
+     */
+    private function buildFilterCriteria(array $filters): CriteriaCompo
+    {
+        $criteria = new CriteriaCompo();
+
+        // Default: only active
+        if (! isset($filters['is_active'])) {
+            $criteria->add(new Criteria('is_active', '1'));
+        } elseif ($filters['is_active'] !== 'all') {
+            $criteria->add(new Criteria('is_active', (string) (int) $filters['is_active']));
+        }
+
+        if (! empty($filters['property_type'])) {
+            $criteria->add(new Criteria('property_type', $this->db->escape($filters['property_type'])));
+        }
+
+        if (! empty($filters['status'])) {
+            $criteria->add(new Criteria('status', $this->db->escape($filters['status'])));
+        }
+
+        if (! empty($filters['city'])) {
+            $criteria->add(new Criteria('city', $this->db->escape($filters['city'])));
+        }
+
+        if (isset($filters['bedrooms_min']) && $filters['bedrooms_min'] > 0) {
+            $criteria->add(new Criteria('bedrooms', (string) (int) $filters['bedrooms_min'], '>='));
+        }
+
+        if (isset($filters['bathrooms_min']) && $filters['bathrooms_min'] > 0) {
+            $criteria->add(new Criteria('bathrooms', (string) (int) $filters['bathrooms_min'], '>='));
+        }
+
+        if (isset($filters['price_min']) && $filters['price_min'] > 0) {
+            $criteria->add(new Criteria('price', (string) (float) $filters['price_min'], '>='));
+        }
+
+        if (isset($filters['price_max']) && $filters['price_max'] > 0) {
+            $criteria->add(new Criteria('price', (string) (float) $filters['price_max'], '<='));
+        }
+
+        if (! empty($filters['is_featured'])) {
+            $criteria->add(new Criteria('is_featured', '1'));
+        }
+
+        if (! empty($filters['owner_id'])) {
+            $criteria->add(new Criteria('owner_id', (string) (int) $filters['owner_id']));
+        }
+
+        return $criteria;
+    }
+
+    /**
+     * Remove a directory recursively.
      */
     private static function removeDirectory(string $dir): void
     {
-        if (!\is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($iterator as $file) {
             if ($file->isDir()) {
-                @\rmdir($file->getRealPath());
+                @rmdir($file->getRealPath());
             } else {
-                @\unlink($file->getRealPath());
+                @unlink($file->getRealPath());
             }
         }
-        @\rmdir($dir);
+        @rmdir($dir);
     }
 }

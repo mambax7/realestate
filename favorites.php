@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,32 +14,33 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Frontend — User Favorites & toggle endpoint
+ * Frontend — User Favorites & toggle endpoint.
  */
 
 use Xmf\Request;
 use XoopsModules\Realestate\Helper;
 
-require_once \dirname(__DIR__, 2) . '/mainfile.php';
+require_once dirname(__DIR__, 2) . '/mainfile.php';
 
 $helper = Helper::getInstance();
 $favoriteHandler = $helper->getHandler('Favorite');
 $propertyHandler = $helper->getHandler('Property');
 
-\xoops_loadLanguage('main', 'realestate');
-\xoops_loadLanguage('modinfo', 'realestate');
+xoops_loadLanguage('main', 'realestate');
+xoops_loadLanguage('modinfo', 'realestate');
 
 // Must be logged in
-if (!isset($GLOBALS['xoopsUser']) || !\is_object($GLOBALS['xoopsUser'])) {
-    \redirect_header(XOOPS_URL . '/user.php', 3, _NOPERM);
+if (! isset($GLOBALS['xoopsUser']) || ! is_object($GLOBALS['xoopsUser'])) {
+    redirect_header(XOOPS_URL . '/user.php', 3, _NOPERM);
 }
-$uid = (int)$GLOBALS['xoopsUser']->getVar('uid');
+$uid = (int) $GLOBALS['xoopsUser']->getVar('uid');
 
 $op = Request::getString('op', 'list', 'REQUEST');
 
@@ -48,16 +51,16 @@ switch ($op) {
             $favoriteHandler->toggle($uid, $propertyId);
         }
         // If AJAX request, return JSON
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && \strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            \header('Content-Type: application/json');
-            echo \json_encode(['success' => true, 'favorited' => $favoriteHandler->isFavorited($uid, $propertyId)]);
+        if (! empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'favorited' => $favoriteHandler->isFavorited($uid, $propertyId)]);
             exit;
         }
         // Otherwise redirect back
-        $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : XOOPS_URL . '/modules/realestate/favorites.php';
-        \redirect_header($referer, 1, '');
-        break;
+        $referer = $_SERVER['HTTP_REFERER'] ?? XOOPS_URL . '/modules/realestate/favorites.php';
+        redirect_header($referer, 1, '');
 
+        break;
     case 'list':
     default:
         $xoopsOption['template_main'] = 'realestate_favorites.tpl';
@@ -66,10 +69,10 @@ switch ($op) {
         $favIds = $favoriteHandler->getUserFavorites($uid);
         $listings = [];
 
-        if (!empty($favIds)) {
-            $criteria = new \CriteriaCompo();
-            $criteria->add(new \Criteria('property_id', '(' . \implode(',', $favIds) . ')', 'IN'));
-            $criteria->add(new \Criteria('is_active', '1'));
+        if (! empty($favIds)) {
+            $criteria = new CriteriaCompo();
+            $criteria->add(new Criteria('property_id', '(' . implode(',', $favIds) . ')', 'IN'));
+            $criteria->add(new Criteria('is_active', '1'));
             $properties = $propertyHandler->getObjects($criteria);
 
             foreach ($properties as $prop) {
@@ -79,10 +82,11 @@ switch ($op) {
 
         $xoopsTpl->assign([
             'properties' => $listings,
-            'total'      => \count($listings),
+            'total'      => count($listings),
             'module_url' => XOOPS_URL . '/modules/realestate',
         ]);
 
         require_once XOOPS_ROOT_PATH . '/footer.php';
+
         break;
 }

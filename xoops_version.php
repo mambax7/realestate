@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,24 +14,23 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Real Estate & Rentals — Module Manifest
+ * Real Estate & Rentals — Module Manifest.
  *
  * @copyright XOOPS Project (https://xoops.org)
  * @license   GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  */
 
-use XoopsModules\Realestate\Constants;
-
 require_once __DIR__ . '/preloads/autoloader.php';
 
-$moduleDirName      = \basename(__DIR__);
-$moduleDirNameUpper = \mb_strtoupper($moduleDirName);
+$moduleDirName = basename(__DIR__);
+$moduleDirNameUpper = mb_strtoupper($moduleDirName);
 
 // -------------------------------------------------------------------------
 // Module metadata
@@ -59,15 +60,15 @@ $modversion = [
 // -------------------------------------------------------------------------
 // Admin
 // -------------------------------------------------------------------------
-$modversion['hasAdmin']    = 1;
+$modversion['hasAdmin'] = 1;
 $modversion['system_menu'] = 1;
-$modversion['adminindex']  = 'admin/index.php';
-$modversion['adminmenu']   = 'admin/menu.php';
+$modversion['adminindex'] = 'admin/index.php';
+$modversion['adminmenu'] = 'admin/menu.php';
 
 // -------------------------------------------------------------------------
 // Main
 // -------------------------------------------------------------------------
-$modversion['hasMain']   = 1;
+$modversion['hasMain'] = 1;
 $modversion['hasSearch'] = 1;
 
 // -------------------------------------------------------------------------
@@ -84,8 +85,8 @@ $modversion['tables'] = [
 // -------------------------------------------------------------------------
 // Install / Update / Uninstall hooks
 // -------------------------------------------------------------------------
-$modversion['onInstall']   = 'include/oninstall.php';
-$modversion['onUpdate']    = 'include/onupdate.php';
+$modversion['onInstall'] = 'include/oninstall.php';
+$modversion['onUpdate'] = 'include/onupdate.php';
 $modversion['onUninstall'] = 'include/onuninstall.php';
 
 // -------------------------------------------------------------------------
@@ -154,7 +155,7 @@ $modversion['config'][$configIndex] = [
     'default'     => 'USD',
     'options'     => ['USD' => 'USD', 'EUR' => 'EUR', 'GBP' => 'GBP', 'CAD' => 'CAD', 'AUD' => 'AUD', 'JPY' => 'JPY'],
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'per_page',
@@ -165,7 +166,7 @@ $modversion['config'][$configIndex] = [
     'default'     => 12,
     'options'     => [6 => 6, 9 => 9, 12 => 12, 18 => 18, 24 => 24],
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'max_images',
@@ -175,7 +176,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 10,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'max_filesize',
@@ -185,7 +186,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 5,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'thumb_width',
@@ -195,7 +196,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 400,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'thumb_height',
@@ -205,7 +206,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 300,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'featured_count',
@@ -215,7 +216,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 6,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'enable_map',
@@ -225,7 +226,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 1,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'require_login_contact',
@@ -235,7 +236,7 @@ $modversion['config'][$configIndex] = [
     'valuetype'   => 'int',
     'default'     => 0,
 ];
-$configIndex++;
+++$configIndex;
 
 $modversion['config'][$configIndex] = [
     'name'        => 'seed_data',
