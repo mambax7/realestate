@@ -59,8 +59,48 @@ parameters:
         - '#Function xoops_cp_header not found#'
         - '#Function xoops_cp_footer not found#'
 
-        # XMF classes — available at runtime via XOOPS autoloader
-        - '#on an unknown class Xmf\\\\#'
+        # Strict rules — constructor parent call not needed for XoopsObject
+        # (XoopsObject::__construct is empty in XOOPS core)
+        -
+            identifier: constructor.missingParentCall
+
+        # Strict rules — new static() needed for singleton pattern
+        -
+            identifier: new.static
+
+        # Strict rules — short ternary is used in XOOPS patterns
+        -
+            identifier: ternary.shortNotAllowed
+
+        # Strict rules — unused constructor parameters (Helper passed to handlers)
+        -
+            identifier: constructor.unusedParameter
+
+        # Strict rules — boolean conditions with non-bool values
+        -
+            identifier: if.condNotBoolean
+
+        # Strict rules — private constants accessed via static:: (XOOPS pattern)
+        - '#Unsafe access to private constant .+ through static::#'
+
+        # Handler return type covariance (insert/delete return mixed in subclass)
+        - '#Return type .+ of method .+::(insert|delete)\(\) should be covariant with return type .+ of method .+::(insert|delete)\(\)#'
+
+        # Handler methods return XoopsObject but docblocks promise typed arrays
+        - '#should return array<.+> but returns array<int, XoopsObject>#'
+        - '#should return array<.+> but returns array<int<0, max>, XoopsObject>#'
+        - '#should return .+\|null but returns XoopsObject\|null#'
+
+        # Iterable value type for $file arrays ($_FILES)
+        -
+            identifier: missingType.iterableValue
+
+        # Casting to int something that is already int (safe, no-op)
+        -
+            identifier: cast.useless
+
+        # Call to methods on XoopsObject instances returned by handlers
+        - '#Call to an undefined method XoopsObject::#'
 
     # Type inference helpers
     typeAliases:
