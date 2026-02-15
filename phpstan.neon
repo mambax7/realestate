@@ -7,9 +7,6 @@ parameters:
     level: 6
 
     paths:
-        - admin
-        - blocks
-        - include
         - class
 
     excludePaths:
@@ -47,12 +44,29 @@ parameters:
         # Smarty template assignments can be mixed
         - '#Cannot access offset .+ on mixed#'
 
+        # Missing generics — legacy XOOPS code
+        -
+            identifier: missingType.generics
+
+        # Strict rules — allow empty() in legacy patterns
+        -
+            identifier: empty.notAllowed
+
+        # XOOPS language constants loaded at runtime
+        - '#Constant _[A-Z_]+ not found#'
+
+        # XOOPS core functions loaded at runtime
+        - '#Function xoops_cp_header not found#'
+        - '#Function xoops_cp_footer not found#'
+
+        # XMF classes — available at runtime via XOOPS autoloader
+        - '#on an unknown class Xmf\\\\#'
+
     # Type inference helpers
     typeAliases:
         XoopsObjectArray: 'array<int, XoopsObject>'
 
     checkMissingIterableValueType: true
-    checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: false
 
     parallel:
