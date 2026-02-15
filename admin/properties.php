@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,29 +14,29 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Admin Properties Management — CRUD, bulk actions, image management
+ * Admin Properties Management — CRUD, bulk actions, image management.
  */
 
 use Xmf\Module\Admin;
 use Xmf\Request;
 use XoopsModules\Realestate\Constants;
 use XoopsModules\Realestate\Helper;
-use XoopsModules\Realestate\Utility;
 use XoopsModules\Realestate\Property;
 
-require_once \dirname(__DIR__, 3) . '/include/cp_header.php';
+require_once dirname(__DIR__, 3) . '/include/cp_header.php';
 require_once __DIR__ . '/header.php';
 xoops_cp_header();
 
 $helper = Helper::getInstance();
 $propertyHandler = $helper->getHandler('Property');
-$imageHandler    = $helper->getHandler('Image');
+$imageHandler = $helper->getHandler('Image');
 
 $op = Request::getString('op', 'list', 'GET');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -49,18 +51,24 @@ switch ($op) {
     // =================================================================
     case 'list':
     default:
-        $adminObject->displayNavigation(\basename(__FILE__));
+        $adminObject->displayNavigation(basename(__FILE__));
 
         // Filters
-        $filterType   = Request::getString('filter_type', '', 'GET');
+        $filterType = Request::getString('filter_type', '', 'GET');
         $filterStatus = Request::getString('filter_status', '', 'GET');
-        $filterCity   = Request::getString('filter_city', '', 'GET');
+        $filterCity = Request::getString('filter_city', '', 'GET');
 
         $filters = [];
         $filters['is_active'] = 'all'; // show all in admin
-        if ($filterType !== '')   $filters['property_type'] = $filterType;
-        if ($filterStatus !== '') $filters['status'] = $filterStatus;
-        if ($filterCity !== '')   $filters['city'] = $filterCity;
+        if ($filterType !== '') {
+            $filters['property_type'] = $filterType;
+        }
+        if ($filterStatus !== '') {
+            $filters['status'] = $filterStatus;
+        }
+        if ($filterCity !== '') {
+            $filters['city'] = $filterCity;
+        }
 
         $start = Request::getInt('start', 0, 'GET');
         $limit = 20;
@@ -95,7 +103,7 @@ switch ($op) {
         echo '<option value="">' . _AM_REALESTATE_ALL . ' ' . _AM_REALESTATE_CITY . '</option>';
         foreach ($cities as $city) {
             $sel = ($filterCity === $city) ? ' selected' : '';
-            echo '<option value="' . \htmlspecialchars($city, ENT_QUOTES) . '"' . $sel . '>' . \htmlspecialchars($city, ENT_QUOTES) . '</option>';
+            echo '<option value="' . htmlspecialchars($city, ENT_QUOTES) . '"' . $sel . '>' . htmlspecialchars($city, ENT_QUOTES) . '</option>';
         }
         echo '</select>';
 
@@ -133,18 +141,18 @@ switch ($op) {
                 echo '<td><input type="checkbox" name="ids[]" value="' . $prop->getId() . '"></td>';
                 echo '<td>' . $prop->getId() . '</td>';
                 echo '<td><img src="' . $thumbUrl . '" alt="" style="width:50px; height:38px; object-fit:cover; border-radius:4px;"></td>';
-                echo '<td><a href="properties.php?op=edit&id=' . $prop->getId() . '"><strong>' . \htmlspecialchars($prop->getTitle(), ENT_QUOTES) . '</strong></a></td>';
+                echo '<td><a href="properties.php?op=edit&id=' . $prop->getId() . '"><strong>' . htmlspecialchars($prop->getTitle(), ENT_QUOTES) . '</strong></a></td>';
                 echo '<td>' . $prop->getPropertyTypeName() . '</td>';
                 echo '<td><span class="re2-status re2-status-' . $prop->getStatus() . '">' . $prop->getStatusName() . '</span></td>';
                 echo '<td>' . $prop->getFormattedPrice() . '</td>';
-                echo '<td>' . \htmlspecialchars($prop->getCity(), ENT_QUOTES) . '</td>';
+                echo '<td>' . htmlspecialchars($prop->getCity(), ENT_QUOTES) . '</td>';
                 echo '<td>' . ($prop->isActive() ? '<i class="fa fa-check" style="color:green;"></i>' : '<i class="fa fa-times" style="color:red;"></i>') . '</td>';
                 echo '<td>' . ($prop->isFeatured() ? '<i class="fa fa-star" style="color:#f39c12;"></i>' : '<i class="fa fa-star" style="color:#ddd;"></i>') . '</td>';
                 echo '<td style="white-space:nowrap;">';
                 echo '<a href="properties.php?op=edit&id=' . $prop->getId() . '" title="Edit" style="margin-right:5px;"><i class="fa fa-edit"></i></a>';
                 echo '<a href="properties.php?op=images&id=' . $prop->getId() . '" title="Images" style="margin-right:5px;"><i class="fa fa-image"></i></a>';
-                echo '<a href="' . XOOPS_URL . '/modules/realestate/property.php?slug=' . \urlencode($prop->getSlug()) . '" target="_blank" title="View" style="margin-right:5px;"><i class="fa fa-eye"></i></a>';
-                echo '<a href="properties.php?op=delete&id=' . $prop->getId() . '" title="Delete" style="color:red;" onclick="return confirm(\'' . \addslashes(_AM_REALESTATE_DELETE_CONFIRM) . '\');"><i class="fa fa-trash"></i></a>';
+                echo '<a href="' . XOOPS_URL . '/modules/realestate/property.php?slug=' . urlencode($prop->getSlug()) . '" target="_blank" title="View" style="margin-right:5px;"><i class="fa fa-eye"></i></a>';
+                echo '<a href="properties.php?op=delete&id=' . $prop->getId() . '" title="Delete" style="color:red;" onclick="return confirm(\'' . addslashes(_AM_REALESTATE_DELETE_CONFIRM) . '\');"><i class="fa fa-trash"></i></a>';
                 echo '</td>';
                 echo '</tr>';
             }
@@ -170,27 +178,27 @@ switch ($op) {
         // Pagination
         if ($total > $limit) {
             require_once XOOPS_ROOT_PATH . '/class/pagenav.php';
-            $pagenav = new \XoopsPageNav($total, $limit, $start, 'start', 'filter_type=' . \urlencode($filterType) . '&filter_status=' . \urlencode($filterStatus) . '&filter_city=' . \urlencode($filterCity));
+            $pagenav = new XoopsPageNav($total, $limit, $start, 'start', 'filter_type=' . urlencode($filterType) . '&filter_status=' . urlencode($filterStatus) . '&filter_city=' . urlencode($filterCity));
             echo '<div style="margin-top:15px; text-align:center;">' . $pagenav->renderNav() . '</div>';
         }
 
         // Check-all JS
         echo '<script>document.getElementById("check-all").addEventListener("change",function(){var c=document.querySelectorAll(\'input[name="ids[]"]\');for(var i=0;i<c.length;i++){c[i].checked=this.checked;}});</script>';
-        break;
 
-    // =================================================================
-    // NEW / EDIT — Property form
-    // =================================================================
+        break;
+        // =================================================================
+        // NEW / EDIT — Property form
+        // =================================================================
     case 'new':
     case 'edit':
-        $adminObject->displayNavigation(\basename(__FILE__));
+        $adminObject->displayNavigation(basename(__FILE__));
 
         $id = Request::getInt('id', 0, 'GET');
         if ($op === 'edit' && $id > 0) {
             /** @var Property $property */
             $property = $propertyHandler->get($id);
-            if (!$property) {
-                \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
+            if (! $property) {
+                redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
             }
             $formTitle = _AM_REALESTATE_EDIT_PROPERTY;
         } else {
@@ -220,7 +228,7 @@ switch ($op) {
         echo '<form method="post" action="properties.php" enctype="multipart/form-data">';
         echo $GLOBALS['xoopsSecurity']->getTokenHTML();
         echo '<input type="hidden" name="op" value="save">';
-        echo '<input type="hidden" name="property_id" value="' . (int)$property->getVar('property_id') . '">';
+        echo '<input type="hidden" name="property_id" value="' . (int) $property->getVar('property_id') . '">';
 
         // ---- TAB: Basic Info ----
         echo '<div class="re2-tab-content" id="tab-basic">';
@@ -228,19 +236,19 @@ switch ($op) {
         // Title
         echo '<div style="margin-bottom:15px;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_TITLE . ' *</label>';
-        echo '<input type="text" name="title" value="' . \htmlspecialchars((string)$property->getVar('title', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" required>';
+        echo '<input type="text" name="title" value="' . htmlspecialchars((string) $property->getVar('title', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" required>';
         echo '</div>';
 
         // Slug
         echo '<div style="margin-bottom:15px;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_SLUG . '</label>';
-        echo '<input type="text" name="slug" value="' . \htmlspecialchars((string)$property->getVar('slug', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="auto-generated">';
+        echo '<input type="text" name="slug" value="' . htmlspecialchars((string) $property->getVar('slug', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="auto-generated">';
         echo '</div>';
 
         // Description (use XOOPS editor)
         echo '<div style="margin-bottom:15px;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_DESCRIPTION . '</label>';
-        echo '<textarea name="description" rows="10" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">' . \htmlspecialchars((string)$property->getVar('description', 'e'), ENT_QUOTES) . '</textarea>';
+        echo '<textarea name="description" rows="10" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">' . htmlspecialchars((string) $property->getVar('description', 'e'), ENT_QUOTES) . '</textarea>';
         echo '</div>';
 
         // Type + Status (inline)
@@ -268,7 +276,7 @@ switch ($op) {
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:2;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_PRICE . '</label>';
-        echo '<input type="number" name="price" value="' . (float)$property->getVar('price') . '" step="0.01" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="price" value="' . (float) $property->getVar('price') . '" step="0.01" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_CURRENCY . '</label>';
@@ -285,19 +293,19 @@ switch ($op) {
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_OWNER . '</label>';
-        echo '<input type="number" name="owner_id" value="' . (int)$property->getVar('owner_id') . '" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="owner_id" value="' . (int) $property->getVar('owner_id') . '" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_FEATURED . '</label>';
         echo '<select name="is_featured" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
-        echo '<option value="0"' . ((int)$property->getVar('is_featured') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
-        echo '<option value="1"' . ((int)$property->getVar('is_featured') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
+        echo '<option value="0"' . ((int) $property->getVar('is_featured') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
+        echo '<option value="1"' . ((int) $property->getVar('is_featured') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
         echo '</select></div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_ACTIVE . '</label>';
         echo '<select name="is_active" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
-        echo '<option value="1"' . ((int)$property->getVar('is_active') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
-        echo '<option value="0"' . ((int)$property->getVar('is_active') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
+        echo '<option value="1"' . ((int) $property->getVar('is_active') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
+        echo '<option value="0"' . ((int) $property->getVar('is_active') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
         echo '</select></div>';
         echo '</div>';
 
@@ -309,32 +317,32 @@ switch ($op) {
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_BEDROOMS . '</label>';
-        echo '<input type="number" name="bedrooms" value="' . (int)$property->getVar('bedrooms') . '" min="0" max="99" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="bedrooms" value="' . (int) $property->getVar('bedrooms') . '" min="0" max="99" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_BATHROOMS . '</label>';
-        echo '<input type="number" name="bathrooms" value="' . (int)$property->getVar('bathrooms') . '" min="0" max="99" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="bathrooms" value="' . (int) $property->getVar('bathrooms') . '" min="0" max="99" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_AREA . '</label>';
-        echo '<input type="number" name="area_m2" value="' . (float)$property->getVar('area_m2') . '" step="0.01" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="area_m2" value="' . (float) $property->getVar('area_m2') . '" step="0.01" min="0" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '</div>';
 
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_YEAR_BUILT . '</label>';
-        echo '<input type="number" name="year_built" value="' . (int)$property->getVar('year_built') . '" min="1800" max="2030" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="number" name="year_built" value="' . (int) $property->getVar('year_built') . '" min="1800" max="2030" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_FURNISHED . '</label>';
         echo '<select name="furnished" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
-        echo '<option value="0"' . ((int)$property->getVar('furnished') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
-        echo '<option value="1"' . ((int)$property->getVar('furnished') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
+        echo '<option value="0"' . ((int) $property->getVar('furnished') === 0 ? ' selected' : '') . '>' . _AM_REALESTATE_NO . '</option>';
+        echo '<option value="1"' . ((int) $property->getVar('furnished') === 1 ? ' selected' : '') . '>' . _AM_REALESTATE_YES . '</option>';
         echo '</select></div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_AVAILABLE_FROM . '</label>';
-        echo '<input type="date" name="available_from" value="' . \htmlspecialchars((string)$property->getVar('available_from', 'n'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="date" name="available_from" value="' . htmlspecialchars((string) $property->getVar('available_from', 'n'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '</div>';
 
@@ -345,32 +353,32 @@ switch ($op) {
 
         echo '<div style="margin-bottom:15px;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_ADDRESS . '</label>';
-        echo '<input type="text" name="address" value="' . \htmlspecialchars((string)$property->getVar('address', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="text" name="address" value="' . htmlspecialchars((string) $property->getVar('address', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
 
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_CITY . '</label>';
-        echo '<input type="text" name="city" value="' . \htmlspecialchars((string)$property->getVar('city', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="text" name="city" value="' . htmlspecialchars((string) $property->getVar('city', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_REGION . '</label>';
-        echo '<input type="text" name="region" value="' . \htmlspecialchars((string)$property->getVar('region', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="text" name="region" value="' . htmlspecialchars((string) $property->getVar('region', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_COUNTRY . '</label>';
-        echo '<input type="text" name="country" value="' . \htmlspecialchars((string)$property->getVar('country', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
+        echo '<input type="text" name="country" value="' . htmlspecialchars((string) $property->getVar('country', 'e'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">';
         echo '</div>';
         echo '</div>';
 
         echo '<div style="display:flex; gap:15px; margin-bottom:15px;">';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_LATITUDE . '</label>';
-        echo '<input type="text" name="latitude" id="latitude" value="' . \htmlspecialchars((string)$property->getVar('latitude'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g. 40.7128">';
+        echo '<input type="text" name="latitude" id="latitude" value="' . htmlspecialchars((string) $property->getVar('latitude'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g. 40.7128">';
         echo '</div>';
         echo '<div style="flex:1;">';
         echo '<label style="display:block; font-weight:bold; margin-bottom:5px;">' . _AM_REALESTATE_LONGITUDE . '</label>';
-        echo '<input type="text" name="longitude" id="longitude" value="' . \htmlspecialchars((string)$property->getVar('longitude'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g. -74.0060">';
+        echo '<input type="text" name="longitude" id="longitude" value="' . htmlspecialchars((string) $property->getVar('longitude'), ENT_QUOTES) . '" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g. -74.0060">';
         echo '</div>';
         echo '</div>';
 
@@ -433,21 +441,21 @@ switch ($op) {
             });
         });
         </script>';
-        break;
 
-    // =================================================================
-    // SAVE
-    // =================================================================
+        break;
+        // =================================================================
+        // SAVE
+        // =================================================================
     case 'save':
-        if (!$GLOBALS['xoopsSecurity']->check()) {
-            \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
+        if (! $GLOBALS['xoopsSecurity']->check()) {
+            redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
         }
 
         $propertyId = Request::getInt('property_id', 0, 'POST');
         if ($propertyId > 0) {
             $property = $propertyHandler->get($propertyId);
-            if (!$property) {
-                \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
+            if (! $property) {
+                redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
             }
         } else {
             $property = $propertyHandler->create();
@@ -458,7 +466,7 @@ switch ($op) {
         $property->setVar('description', Request::getText('description', '', 'POST'));
         $property->setVar('property_type', Request::getString('property_type', 'house', 'POST'));
         $property->setVar('status', Request::getString('status', 'for_sale', 'POST'));
-        $property->setVar('price', (string)(float)Request::getString('price', '0', 'POST'));
+        $property->setVar('price', (string) (float) Request::getString('price', '0', 'POST'));
         $property->setVar('currency', Request::getString('currency', 'USD', 'POST'));
         $property->setVar('address', Request::getString('address', '', 'POST'));
         $property->setVar('city', Request::getString('city', '', 'POST'));
@@ -467,12 +475,12 @@ switch ($op) {
 
         $lat = Request::getString('latitude', '', 'POST');
         $lng = Request::getString('longitude', '', 'POST');
-        $property->setVar('latitude', $lat !== '' ? (string)(float)$lat : null);
-        $property->setVar('longitude', $lng !== '' ? (string)(float)$lng : null);
+        $property->setVar('latitude', $lat !== '' ? (string) (float) $lat : null);
+        $property->setVar('longitude', $lng !== '' ? (string) (float) $lng : null);
 
         $property->setVar('bedrooms', Request::getInt('bedrooms', 0, 'POST'));
         $property->setVar('bathrooms', Request::getInt('bathrooms', 0, 'POST'));
-        $property->setVar('area_m2', (string)(float)Request::getString('area_m2', '0', 'POST'));
+        $property->setVar('area_m2', (string) (float) Request::getString('area_m2', '0', 'POST'));
         $property->setVar('year_built', Request::getInt('year_built', 0, 'POST'));
         $property->setVar('furnished', Request::getInt('furnished', 0, 'POST'));
         $property->setVar('available_from', Request::getString('available_from', '', 'POST'));
@@ -481,82 +489,87 @@ switch ($op) {
         $property->setVar('is_active', Request::getInt('is_active', 1, 'POST'));
 
         if ($propertyHandler->insert($property, true)) {
-            \redirect_header('properties.php', 2, _AM_REALESTATE_PROPERTY_SAVED);
+            redirect_header('properties.php', 2, _AM_REALESTATE_PROPERTY_SAVED);
         } else {
-            \redirect_header('properties.php', 3, 'Error saving property.');
+            redirect_header('properties.php', 3, 'Error saving property.');
         }
-        break;
 
-    // =================================================================
-    // DELETE
-    // =================================================================
+        break;
+        // =================================================================
+        // DELETE
+        // =================================================================
     case 'delete':
         $id = Request::getInt('id', 0, 'GET');
         $property = $propertyHandler->get($id);
-        if (!$property) {
-            \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
+        if (! $property) {
+            redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
         }
         if ($propertyHandler->delete($property, true)) {
-            \redirect_header('properties.php', 2, _AM_REALESTATE_PROPERTY_DELETED);
+            redirect_header('properties.php', 2, _AM_REALESTATE_PROPERTY_DELETED);
         }
-        \redirect_header('properties.php', 3, 'Error deleting property.');
-        break;
+        redirect_header('properties.php', 3, 'Error deleting property.');
 
-    // =================================================================
-    // BULK ACTIONS
-    // =================================================================
+        break;
+        // =================================================================
+        // BULK ACTIONS
+        // =================================================================
     case 'bulk':
-        if (!$GLOBALS['xoopsSecurity']->check()) {
-            \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
+        if (! $GLOBALS['xoopsSecurity']->check()) {
+            redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
         }
         $ids = Request::getArray('ids', [], 'POST');
         $action = Request::getString('bulk_action', '', 'POST');
 
         if (empty($ids) || $action === '') {
-            \redirect_header('properties.php', 2, _AM_REALESTATE_NO_SELECTION);
+            redirect_header('properties.php', 2, _AM_REALESTATE_NO_SELECTION);
         }
 
         $table = $GLOBALS['xoopsDB']->prefix('realestate_properties');
-        $idList = \implode(',', \array_map('intval', $ids));
+        $idList = implode(',', array_map('intval', $ids));
 
         switch ($action) {
             case 'activate':
                 $GLOBALS['xoopsDB']->queryF("UPDATE `{$table}` SET `is_active` = 1 WHERE `property_id` IN ({$idList})");
+
                 break;
             case 'deactivate':
                 $GLOBALS['xoopsDB']->queryF("UPDATE `{$table}` SET `is_active` = 0 WHERE `property_id` IN ({$idList})");
+
                 break;
             case 'feature':
                 $GLOBALS['xoopsDB']->queryF("UPDATE `{$table}` SET `is_featured` = 1 WHERE `property_id` IN ({$idList})");
+
                 break;
             case 'unfeature':
                 $GLOBALS['xoopsDB']->queryF("UPDATE `{$table}` SET `is_featured` = 0 WHERE `property_id` IN ({$idList})");
+
                 break;
             case 'delete':
                 foreach ($ids as $id) {
-                    $prop = $propertyHandler->get((int)$id);
+                    $prop = $propertyHandler->get((int) $id);
                     if ($prop) {
                         $propertyHandler->delete($prop, true);
                     }
                 }
+
                 break;
         }
-        \redirect_header('properties.php', 2, _AM_REALESTATE_BULK_DONE);
-        break;
+        redirect_header('properties.php', 2, _AM_REALESTATE_BULK_DONE);
 
-    // =================================================================
-    // IMAGES — manage property images
-    // =================================================================
+        break;
+        // =================================================================
+        // IMAGES — manage property images
+        // =================================================================
     case 'images':
-        $adminObject->displayNavigation(\basename(__FILE__));
+        $adminObject->displayNavigation(basename(__FILE__));
         $id = Request::getInt('id', 0, 'GET');
         $property = $propertyHandler->get($id);
-        if (!$property) {
-            \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
+        if (! $property) {
+            redirect_header('properties.php', 3, _AM_REALESTATE_ERR_NOT_FOUND);
         }
 
         echo '<div style="background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">';
-        echo '<h3 style="margin-top:0;">' . _AM_REALESTATE_IMAGES . ': ' . \htmlspecialchars($property->getTitle(), ENT_QUOTES) . '</h3>';
+        echo '<h3 style="margin-top:0;">' . _AM_REALESTATE_IMAGES . ': ' . htmlspecialchars($property->getTitle(), ENT_QUOTES) . '</h3>';
         echo '<p><a href="properties.php?op=edit&id=' . $id . '">&larr; ' . _AM_REALESTATE_EDIT_PROPERTY . '</a></p>';
 
         // Upload form
@@ -581,11 +594,11 @@ switch ($op) {
         } else {
             echo '<div id="image-gallery" style="display:flex; flex-wrap:wrap; gap:15px;">';
             foreach ($images as $img) {
-                $isPrimary = (int)$img->getVar('is_primary') === 1;
+                $isPrimary = (int) $img->getVar('is_primary') === 1;
                 echo '<div class="re2-image-card" data-id="' . $img->getId() . '" style="width:200px; background:#f9f9f9; border-radius:8px; overflow:hidden; border:2px solid ' . ($isPrimary ? '#f39c12' : 'transparent') . '; cursor:move;">';
                 echo '<img src="' . $img->getThumbUrl() . '" alt="" style="width:100%; height:150px; object-fit:cover;">';
                 echo '<div style="padding:8px;">';
-                echo '<div style="font-size:12px; color:#666; margin-bottom:5px;">' . \htmlspecialchars((string)$img->getVar('title', 's'), ENT_QUOTES) . '</div>';
+                echo '<div style="font-size:12px; color:#666; margin-bottom:5px;">' . htmlspecialchars((string) $img->getVar('title', 's'), ENT_QUOTES) . '</div>';
                 if ($isPrimary) {
                     echo '<span style="background:#f39c12; color:#fff; padding:2px 6px; border-radius:3px; font-size:11px;"><i class="fa fa-star"></i> Primary</span> ';
                 } else {
@@ -630,60 +643,60 @@ switch ($op) {
             });
         })();
         </script>';
-        break;
 
-    // =================================================================
-    // UPLOAD IMAGE
-    // =================================================================
+        break;
+        // =================================================================
+        // UPLOAD IMAGE
+        // =================================================================
     case 'upload_image':
-        if (!$GLOBALS['xoopsSecurity']->check()) {
-            \redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
+        if (! $GLOBALS['xoopsSecurity']->check()) {
+            redirect_header('properties.php', 3, _AM_REALESTATE_ERR_TOKEN);
         }
         $propertyId = Request::getInt('property_id', 0, 'POST');
-        $title      = Request::getString('image_title', '', 'POST');
-        $isPrimary  = Request::getInt('is_primary', 0, 'POST') === 1;
+        $title = Request::getString('image_title', '', 'POST');
+        $isPrimary = Request::getInt('is_primary', 0, 'POST') === 1;
 
-        if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-            \redirect_header('properties.php?op=images&id=' . $propertyId, 3, _AM_REALESTATE_ERR_UPLOAD);
+        if (! isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            redirect_header('properties.php?op=images&id=' . $propertyId, 3, _AM_REALESTATE_ERR_UPLOAD);
         }
 
         $result = $imageHandler->uploadImage($_FILES['image'], $propertyId, $title, $isPrimary);
-        if (\is_string($result)) {
-            \redirect_header('properties.php?op=images&id=' . $propertyId, 3, $result);
+        if (is_string($result)) {
+            redirect_header('properties.php?op=images&id=' . $propertyId, 3, $result);
         }
-        \redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_IMAGE_UPLOADED);
-        break;
+        redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_IMAGE_UPLOADED);
 
-    // =================================================================
-    // SET PRIMARY IMAGE
-    // =================================================================
+        break;
+        // =================================================================
+        // SET PRIMARY IMAGE
+        // =================================================================
     case 'set_primary':
-        $imageId    = Request::getInt('image_id', 0, 'GET');
+        $imageId = Request::getInt('image_id', 0, 'GET');
         $propertyId = Request::getInt('property_id', 0, 'GET');
         $imageHandler->setPrimary($imageId, $propertyId);
-        \redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_PRIMARY_SET);
-        break;
+        redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_PRIMARY_SET);
 
-    // =================================================================
-    // DELETE IMAGE
-    // =================================================================
+        break;
+        // =================================================================
+        // DELETE IMAGE
+        // =================================================================
     case 'delete_image':
-        $imageId    = Request::getInt('image_id', 0, 'GET');
+        $imageId = Request::getInt('image_id', 0, 'GET');
         $propertyId = Request::getInt('property_id', 0, 'GET');
         $image = $imageHandler->get($imageId);
         if ($image) {
             $imageHandler->delete($image, true);
         }
-        \redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_IMAGE_DELETED);
-        break;
+        redirect_header('properties.php?op=images&id=' . $propertyId, 2, _AM_REALESTATE_IMAGE_DELETED);
 
-    // =================================================================
-    // REORDER IMAGES (AJAX)
-    // =================================================================
+        break;
+        // =================================================================
+        // REORDER IMAGES (AJAX)
+        // =================================================================
     case 'reorder_images':
         $order = Request::getString('order', '', 'POST');
         if ($order !== '') {
-            $imageIds = \array_map('intval', \explode(',', $order));
+            $imageIds = array_map('intval', explode(',', $order));
             $imageHandler->updateSortOrder($imageIds);
         }
         echo 'ok';

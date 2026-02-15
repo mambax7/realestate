@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,13 +14,14 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Block: Browse by City
+ * Block: Browse by City.
  */
 
 use XoopsModules\Realestate\Helper;
@@ -28,26 +31,26 @@ use XoopsModules\Realestate\Helper;
  */
 function realestate_cities_show(array $options): array
 {
-    require_once \dirname(__DIR__) . '/preloads/autoloader.php';
-    \xoops_loadLanguage('main', 'realestate');
-    \xoops_loadLanguage('modinfo', 'realestate');
-    \xoops_loadLanguage('blocks', 'realestate');
+    require_once dirname(__DIR__) . '/preloads/autoloader.php';
+    xoops_loadLanguage('main', 'realestate');
+    xoops_loadLanguage('modinfo', 'realestate');
+    xoops_loadLanguage('blocks', 'realestate');
 
-    $maxCities = isset($options[0]) ? (int)$options[0] : 10;
-    $showCount = isset($options[1]) ? (int)$options[1] : 1;
+    $maxCities = isset($options[0]) ? (int) $options[0] : 10;
+    $showCount = isset($options[1]) ? (int) $options[1] : 1;
 
-    $helper  = Helper::getInstance();
+    $helper = Helper::getInstance();
     $handler = $helper->getHandler('Property');
 
     $block = [];
-    $block['module_url']  = XOOPS_URL . '/modules/realestate';
-    $block['show_count']  = $showCount;
-    $block['cities']      = [];
+    $block['module_url'] = XOOPS_URL . '/modules/realestate';
+    $block['show_count'] = $showCount;
+    $block['cities'] = [];
 
-    /** @var \XoopsMySQLDatabase $db */
-    $db = \XoopsDatabaseFactory::getDatabaseConnection();
+    /** @var XoopsMySQLDatabase $db */
+    $db = XoopsDatabaseFactory::getDatabaseConnection();
     $table = $db->prefix('realestate_properties');
-    $sql = \sprintf(
+    $sql = sprintf(
         "SELECT `city`, COUNT(*) AS cnt FROM `%s` WHERE `is_active` = 1 AND `city` != '' GROUP BY `city` ORDER BY cnt DESC LIMIT %d",
         $table,
         $maxCities
@@ -57,8 +60,8 @@ function realestate_cities_show(array $options): array
         while ($row = $db->fetchArray($result)) {
             $block['cities'][] = [
                 'name'  => $row['city'],
-                'count' => (int)$row['cnt'],
-                'url'   => XOOPS_URL . '/modules/realestate/index.php?city=' . \urlencode($row['city']),
+                'count' => (int) $row['cnt'],
+                'url'   => XOOPS_URL . '/modules/realestate/index.php?city=' . urlencode($row['city']),
             ];
         }
     }
@@ -68,10 +71,10 @@ function realestate_cities_show(array $options): array
 
 function realestate_cities_edit(array $options): string
 {
-    \xoops_loadLanguage('blocks', 'realestate');
+    xoops_loadLanguage('blocks', 'realestate');
 
-    $maxCities = isset($options[0]) ? (int)$options[0] : 10;
-    $showCount = isset($options[1]) ? (int)$options[1] : 1;
+    $maxCities = isset($options[0]) ? (int) $options[0] : 10;
+    $showCount = isset($options[1]) ? (int) $options[1] : 1;
 
     $form = '';
     $form .= '<div style="margin-bottom:8px;">';
@@ -81,7 +84,7 @@ function realestate_cities_edit(array $options): string
 
     $form .= '<div style="margin-bottom:8px;">';
     $form .= '<label>' . _MB_REALESTATE_CITIES_SHOW_COUNT . ': </label>';
-    $form .= '<select name="options[1]"><option value="1"' . ($showCount ? ' selected' : '') . '>Yes</option><option value="0"' . (!$showCount ? ' selected' : '') . '>No</option></select>';
+    $form .= '<select name="options[1]"><option value="1"' . ($showCount ? ' selected' : '') . '>Yes</option><option value="0"' . (! $showCount ? ' selected' : '') . '>No</option></select>';
     $form .= '</div>';
 
     return $form;

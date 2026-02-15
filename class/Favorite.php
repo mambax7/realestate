@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,23 +14,28 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 namespace XoopsModules\Realestate;
 
+use XoopsObject;
+
+use const XOBJ_DTYPE_INT;
+
 /**
- * Favorite entity
+ * Favorite entity.
  */
-class Favorite extends \XoopsObject
+class Favorite extends XoopsObject
 {
     public function __construct()
     {
-        $this->initVar('favorite_id', \XOBJ_DTYPE_INT, 0);
-        $this->initVar('user_id', \XOBJ_DTYPE_INT, 0);
-        $this->initVar('property_id', \XOBJ_DTYPE_INT, 0);
-        $this->initVar('created_at', \XOBJ_DTYPE_INT, 0);
+        $this->initVar('favorite_id', XOBJ_DTYPE_INT, 0);
+        $this->initVar('user_id', XOBJ_DTYPE_INT, 0);
+        $this->initVar('property_id', XOBJ_DTYPE_INT, 0);
+        $this->initVar('created_at', XOBJ_DTYPE_INT, 0);
     }
 }
