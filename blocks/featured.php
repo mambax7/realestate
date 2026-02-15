@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,13 +14,14 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Block: Featured Properties
+ * Block: Featured Properties.
  */
 
 use XoopsModules\Realestate\Helper;
@@ -28,13 +31,13 @@ use XoopsModules\Realestate\Helper;
  */
 function realestate_featured_show(array $options): array
 {
-    require_once \dirname(__DIR__) . '/preloads/autoloader.php';
-    \xoops_loadLanguage('main', 'realestate');
-    \xoops_loadLanguage('modinfo', 'realestate');
+    require_once dirname(__DIR__) . '/preloads/autoloader.php';
+    xoops_loadLanguage('main', 'realestate');
+    xoops_loadLanguage('modinfo', 'realestate');
 
-    $limit     = isset($options[0]) ? (int)$options[0] : 6;
-    $showPrice = isset($options[1]) ? (int)$options[1] : 1;
-    $showImage = isset($options[2]) ? (int)$options[2] : 1;
+    $limit = isset($options[0]) ? (int) $options[0] : 6;
+    $showPrice = isset($options[1]) ? (int) $options[1] : 1;
+    $showImage = isset($options[2]) ? (int) $options[2] : 1;
 
     $helper = Helper::getInstance();
     $handler = $helper->getHandler('Property');
@@ -55,15 +58,16 @@ function realestate_featured_show(array $options): array
 
 /**
  * @param array $options
+ *
  * @return string
  */
 function realestate_featured_edit(array $options): string
 {
-    \xoops_loadLanguage('blocks', 'realestate');
+    xoops_loadLanguage('blocks', 'realestate');
 
-    $limit     = isset($options[0]) ? (int)$options[0] : 6;
-    $showPrice = isset($options[1]) ? (int)$options[1] : 1;
-    $showImage = isset($options[2]) ? (int)$options[2] : 1;
+    $limit = isset($options[0]) ? (int) $options[0] : 6;
+    $showPrice = isset($options[1]) ? (int) $options[1] : 1;
+    $showImage = isset($options[2]) ? (int) $options[2] : 1;
 
     $form = '';
     $form .= '<div style="margin-bottom:8px;">';
@@ -75,14 +79,14 @@ function realestate_featured_edit(array $options): string
     $form .= '<label>' . _MB_REALESTATE_FEATURED_SHOW_PRICE . ': </label>';
     $form .= '<select name="options[1]">';
     $form .= '<option value="1"' . ($showPrice ? ' selected' : '') . '>Yes</option>';
-    $form .= '<option value="0"' . (!$showPrice ? ' selected' : '') . '>No</option>';
+    $form .= '<option value="0"' . (! $showPrice ? ' selected' : '') . '>No</option>';
     $form .= '</select></div>';
 
     $form .= '<div style="margin-bottom:8px;">';
     $form .= '<label>' . _MB_REALESTATE_FEATURED_SHOW_IMAGE . ': </label>';
     $form .= '<select name="options[2]">';
     $form .= '<option value="1"' . ($showImage ? ' selected' : '') . '>Yes</option>';
-    $form .= '<option value="0"' . (!$showImage ? ' selected' : '') . '>No</option>';
+    $form .= '<option value="0"' . (! $showImage ? ' selected' : '') . '>No</option>';
     $form .= '</select></div>';
 
     return $form;

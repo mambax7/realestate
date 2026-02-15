@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -12,38 +14,39 @@
 /**
  * @copyright       2026 XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ *
  * @since           1.0
+ *
  * @author          XOOPS Development Team (Mamba)
  */
 
-
 /**
- * Admin Dashboard
+ * Admin Dashboard.
  */
 
 use Xmf\Module\Admin;
 use Xmf\Request;
 use XoopsModules\Realestate\Helper;
 
-require_once \dirname(__DIR__, 3) . '/include/cp_header.php';
+require_once dirname(__DIR__, 3) . '/include/cp_header.php';
 require_once __DIR__ . '/header.php';
 xoops_cp_header();
 
 $helper = Helper::getInstance();
 $propertyHandler = $helper->getHandler('Property');
-$messageHandler  = $helper->getHandler('Message');
+$messageHandler = $helper->getHandler('Message');
 
 // Handle seed action
 $op = Request::getString('op', '', 'POST');
 if ($op === 'seed') {
-    if (!$GLOBALS['xoopsSecurity']->check()) {
-        \redirect_header('index.php', 3, _AM_REALESTATE_SEED_FAIL);
+    if (! $GLOBALS['xoopsSecurity']->check()) {
+        redirect_header('index.php', 3, _AM_REALESTATE_SEED_FAIL);
     }
-    require_once \dirname(__DIR__) . '/include/seed.php';
+    require_once dirname(__DIR__) . '/include/seed.php';
     if (realestate_seed_data()) {
-        \redirect_header('index.php', 2, _AM_REALESTATE_SEED_DONE);
+        redirect_header('index.php', 2, _AM_REALESTATE_SEED_DONE);
     } else {
-        \redirect_header('index.php', 3, _AM_REALESTATE_SEED_FAIL);
+        redirect_header('index.php', 3, _AM_REALESTATE_SEED_FAIL);
     }
 }
 
@@ -52,7 +55,7 @@ $unreadMessages = $messageHandler->getUnreadCount();
 
 // Admin header
 $adminObject = Admin::getInstance();
-$adminObject->displayNavigation(\basename(__FILE__));
+$adminObject->displayNavigation(basename(__FILE__));
 
 // Dashboard HTML
 echo '<div class="re2-admin-dashboard">';
@@ -76,7 +79,7 @@ foreach ($cards as $card) {
     echo '<div style="display:flex; align-items:center; gap:10px;">';
     echo '<i class="fa ' . $card['icon'] . '" style="font-size:24px; color:' . $card['color'] . ';"></i>';
     echo '<div>';
-    echo '<div style="font-size:28px; font-weight:bold; color:#333;">' . (int)$card['value'] . '</div>';
+    echo '<div style="font-size:28px; font-weight:bold; color:#333;">' . (int) $card['value'] . '</div>';
     echo '<div style="font-size:13px; color:#777;">' . $card['label'] . '</div>';
     echo '</div></div></div>';
 }
@@ -105,7 +108,7 @@ echo '</div>';
 
 // Recent properties
 $recent = $propertyHandler->getLatest(5);
-if (!empty($recent)) {
+if (! empty($recent)) {
     echo '<div style="background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">';
     echo '<h3 style="margin-top:0;">Recent Properties</h3>';
     echo '<table class="outer" style="width:100%; border-collapse:collapse;">';
@@ -113,10 +116,10 @@ if (!empty($recent)) {
     foreach ($recent as $prop) {
         echo '<tr>';
         echo '<td>' . $prop->getId() . '</td>';
-        echo '<td><a href="properties.php?op=edit&id=' . $prop->getId() . '">' . \htmlspecialchars($prop->getTitle(), ENT_QUOTES) . '</a></td>';
+        echo '<td><a href="properties.php?op=edit&id=' . $prop->getId() . '">' . htmlspecialchars($prop->getTitle(), ENT_QUOTES) . '</a></td>';
         echo '<td>' . $prop->getStatusName() . '</td>';
         echo '<td>' . $prop->getFormattedPrice() . '</td>';
-        echo '<td>' . \htmlspecialchars($prop->getCity(), ENT_QUOTES) . '</td>';
+        echo '<td>' . htmlspecialchars($prop->getCity(), ENT_QUOTES) . '</td>';
         echo '<td><a href="properties.php?op=edit&id=' . $prop->getId() . '"><i class="fa fa-edit"></i></a> ';
         echo '<a href="properties.php?op=images&id=' . $prop->getId() . '"><i class="fa fa-image"></i></a></td>';
         echo '</tr>';
